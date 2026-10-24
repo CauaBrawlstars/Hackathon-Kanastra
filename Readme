@@ -1,1 +1,30 @@
-<h2>Informações sobre o projeto do Hackaton da Kanastra equipe MVP</>
+Informações sobre o projeto do Hackaton da Kanastra equipe MVP
+--------------------------------------------------------------
+Como instalar o fastapi[all]
+
+1. Abra o terminal (Prompt de Comando/PowerShell no Windows, Terminal no Linux/Mac).
+
+2. Execute o comando:
+
+bash
+pip install "fastapi[all]"
+
+Use as aspas, porque alguns terminais, como o zsh do Mac, dão erro sem elas.
+
+3. Aguarde o download e a instalação. Ao terminar, aparece uma mensagem Successfully installed ... com a lista de pacotes.
+
+4. Confirme que instalou:
+
+bash
+pip show fastapi
+
+Se aparecerem o nome e a versão, a instalação deu certo.
+
+Se der erro
+pip não é reconhecido: use python -m pip install "fastapi[all]", ou python3 -m pip install "fastapi[all]" no Linux/Mac.
+externally-managed-environment (Linux/Mac): crie um ambiente virtual antes de instalar:
+bash
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install "fastapi[all]"
+
