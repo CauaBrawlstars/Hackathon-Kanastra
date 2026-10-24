@@ -67,7 +67,7 @@ def ver_config():
 @app.post("/api/notas/validar")
 def validar_lote(
     file: UploadFile = File(...),
-    data_referencia: date | None = Query(None, description="AAAA-MM-DD. Data a partir da qual prazo e vencimento são calculados; padrão: hoje"),
+    data_referencia: date | None = Query(None, description="AAAA-MM-DD. Só é usada para notas sem DATA_AQUISICAO no arquivo; padrão: hoje"),
 ):
     if not (file.filename or "").lower().endswith(".csv"):
         raise HTTPException(400, "Envie um arquivo .csv.")

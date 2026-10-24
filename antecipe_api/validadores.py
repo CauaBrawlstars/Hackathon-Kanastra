@@ -61,9 +61,9 @@ def montar_contexto(itens: list[Recebivel], data_referencia: date, colunas: set)
 
 
 def data_base(r: Recebivel, ctx: Contexto) -> date:
-    """Prazo, vencimento e desconto são sempre contados a partir da data de referência
-    (hoje, por padrão). A data de aquisição do arquivo não entra no cálculo."""
-    return ctx.data_referencia
+    """Prazo, vencimento e desconto são contados a partir da DATA_AQUISICAO da própria nota.
+    Se o arquivo não trouxer essa coluna, usa a data de referência (hoje, por padrão)."""
+    return r.data_aquisicao or ctx.data_referencia
 
 
 def prazo_dias(r: Recebivel, ctx: Contexto) -> int:
