@@ -1,6 +1,3 @@
-Informações sobre o projeto do Hackaton da Kanastra equipe MVP
---------------------------------------------------------------
-
 # 🚀 Portal Antecipe
 
 > Transformando vendas a prazo em fluxo de caixa imediato para pequenas empresas, com avaliação de risco inteligente e transparente.
@@ -22,49 +19,56 @@ Nossa solução automatiza e simplifica esse processo com um motor de elegibilid
 - **Motor de Regras Configurável:** Arquitetura modelada para permitir que o gestor do fundo altere os parâmetros (ex: prazo máximo, taxa) sem a necessidade de novos deploys.
 - **Garantia de Idempotência:** Sistema blindado contra *double spending*, garantindo que o mesmo recebível jamais seja vendido ou processado duas vezes.
 
-### 🛠 Tecnologias Utilizadas
-- **Frontend:** HTML[Tailwind e Google Fonts, por CDN]
-- **Backend:**Python[Framework Fast API]
-- **Infraestrutura:** [LocalHost com conexão Internet]
+## 🛠 Tecnologias Utilizadas
+- **Frontend:** HTML nativo utilizando Tailwind CSS e Google Fonts (via CDN).
+- **Backend:** Python com o framework FastAPI.
+- **Infraestrutura:** Localhost.
 
-#################################################################
+> ⚠️ **Aviso Importante:** Para o correto funcionamento do projeto, é **obrigatória a conexão com a internet**. O frontend depende de bibliotecas externas (Tailwind CSS e Google Fonts carregados via CDN) para renderizar a interface visual corretamente.
 
-Como instalar o fastapi[all]
+## 🚀 Como executar localmente
 
-1. Abra o terminal (Prompt de Comando/PowerShell no Windows, Terminal no Linux/Mac).
+### 1. Clonar o repositório
+```bash
+git clone https://github.com/sua-equipe/portal-antecipe.git
+cd portal-antecipe
+```
 
-2. Execute o comando:
+### 2. Configurar e rodar o Backend (FastAPI)
+Abra o seu terminal (Prompt de Comando/PowerShell no Windows, ou Terminal no Linux/Mac) e execute o comando abaixo para instalar o framework e suas dependências essenciais:
 
-bash
+```bash
 pip install "fastapi[all]"
+```
+*(Nota: O uso de aspas é recomendado para evitar erros em terminais como o Zsh no Mac/Linux).*
 
-Use as aspas, porque alguns terminais, como o zsh do Mac, dão erro sem elas.
-
-3. Aguarde o download e a instalação. Ao terminar, aparece uma mensagem Successfully installed ... com a lista de pacotes.
-
-4. Confirme que instalou:
-
-bash
+Aguarde o download. Uma mensagem de `Successfully installed ...` confirmará o sucesso. Para garantir que a instalação ocorreu corretamente, verifique a versão instalada:
+```bash
 pip show fastapi
+```
 
-Se aparecerem o nome e a versão, a instalação deu certo.
+Após a instalação, inicie o servidor:
+```bash
+uvicorn main:app --reload
+```
+A API estará disponível em `http://localhost:8000`.
 
-Se der erro
-pip não é reconhecido: use python -m pip install "fastapi[all]", ou python3 -m pip install "fastapi[all]" no Linux/Mac.
-externally-managed-environment (Linux/Mac): crie um ambiente virtual antes de instalar:
-bash
-  python3 -m venv .venv
-  source .venv/bin/activate
-  pip install "fastapi[all]"
+**Solução de Problemas Comuns (Troubleshooting):**
+*   **Comando `pip` não reconhecido:** Tente utilizar `python -m pip install "fastapi[all]"` (ou `python3 -m pip install "fastapi[all]"` no Linux/Mac).
+*   **Erro `externally-managed-environment` (Linux/Mac):** Crie um ambiente virtual antes de instalar as dependências:
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install "fastapi[all]"
+    ```
 
-Para efetividade do projeto é necessária conexão com rede internet, o frontend depende de duas bibliotecas externas (Tailwind e
-Google Fonts, por CDN), então precisa de internet para ficar com o visual correto.
+### 3. Rodar o Frontend
+Como o projeto utiliza arquivos estáticos via CDN, não é necessário realizar processos de *build*. Basta abrir o arquivo `index.html` (localizado na pasta do frontend) diretamente no seu navegador web ou utilizar a extensão *Live Server* na sua IDE.
 
+## Registro de Prompts:
+https://docs.google.com/document/d/154wWpaVjKimVpzvXibQOtD67Bxwn60aH3VSsKC1HEac/edit?tab=t.0
 
-👥 Equipe
-
-    Cauã Victor Ribeiro Soares - [BackEnd Developer] - https://www.linkedin.com/in/cau%C3%A3-victor-ribeiro-soares-03a69b3a9/
-
-    Pedro Miranda Borges - [FrontEnd Developer] - https://www.linkedin.com/in/pedro-miranda-borges-a1760a3ab/
-
-    Vitor Luiz Martins de Abreu - [BackEnd Developer] - [LinkedIn/GitHub]
+## 👥 Equipe (MVP)
+*   **Cauã Victor Ribeiro Soares** - Backend Developer - [LinkedIn](https://www.linkedin.com/in/cau%C3%A3-victor-ribeiro-soares-03a69b3a9/)
+*   **Pedro Miranda Borges** - Frontend Developer - [LinkedIn](https://www.linkedin.com/in/pedro-miranda-borges-a1760a3ab/)
+*   **Vitor Luiz Martins de Abreu** - Backend Developer - [LinkedIn/GitHub]
