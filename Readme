@@ -28,43 +28,105 @@ Nossa solução automatiza e simplifica esse processo com um motor de elegibilid
 
 ## 🚀 Como executar localmente
 
-### 1. Clonar o repositório
+# Antecipe – Validador de Recebíveis (ANTECIPE FIDC)
+
+API em Python (FastAPI) que lê um CSV de recebíveis, valida cada nota com as regras
+do fundo (`config_fundo.json`), classifica como **Aprovada** ou **Negada** e calcula
+o valor a receber das aprovadas. A tela (`antecipe_simulador.html`) é servida pelo
+próprio servidor, então basta subir a API.
+
+## Requisitos
+
+- Python **3.10 ou superior** (`python3 --version`)
+- Git
+
+## Passo a passo
+
+### 1. Baixar o projeto
+
 ```bash
-git clone https://github.com/sua-equipe/portal-antecipe.git
-cd portal-antecipe
+git clone <URL_DO_REPOSITORIO>
+cd <PASTA_DO_PROJETO>      # a pasta que contém o arquivo main.py
 ```
 
-### 2. Configurar e rodar o Backend (FastAPI)
-Abra o seu terminal (Prompt de Comando/PowerShell no Windows, ou Terminal no Linux/Mac) e execute o comando abaixo para instalar o framework e suas dependências essenciais:
+### 2. Criar o ambiente virtual
 
+Linux / macOS:
 ```bash
-pip install "fastapi[all]"
-```
-*(Nota: O uso de aspas é recomendado para evitar erros em terminais como o Zsh no Mac/Linux).*
-
-Aguarde o download. Uma mensagem de `Successfully installed ...` confirmará o sucesso. Para garantir que a instalação ocorreu corretamente, verifique a versão instalada:
-```bash
-pip show fastapi
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-Após a instalação, inicie o servidor:
+Windows (PowerShell):
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+Se o Debian/Ubuntu reclamar de `ensurepip`, instale antes: `sudo apt install python3-venv`.
+
+### 3. Instalar as dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Iniciar o servidor (API + tela)
+
 ```bash
 uvicorn main:app --reload
 ```
-A API estará disponível em `http://localhost:8000`.
 
-**Solução de Problemas Comuns (Troubleshooting):**
-*   **Comando `pip` não reconhecido:** Tente utilizar `python -m pip install "fastapi[all]"` (ou `python3 -m pip install "fastapi[all]"` no Linux/Mac).
-*   **Erro `externally-managed-environment` (Linux/Mac):** Crie um ambiente virtual antes de instalar as dependências:
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install "fastapi[all]"
-    ```
+Aguarde a mensagem `Application startup complete`. **Deixe este terminal aberto**
+enquanto usar o sistema.
 
-### 3. Rodar o Frontend
-Como o projeto utiliza arquivos estáticos via CDN, não é necessário realizar processos de *build*. Basta abrir o arquivo `index.html` (localizado na pasta do frontend) diretamente no seu navegador web ou utilizar a extensão *Live Server* na sua IDE.
+### 5. Abrir no navegador
 
+| O quê | Endereço |
+|---|---|
+| Tela do sistema | http://127.0.0.1:8000 |
+| Documentação interativa da API (Swagger) | http://127.0.0.1:8000/docs |
+| Regras configuradas (JSON) | http://127.0.0.1:8000/api/config |
+
+### 6. Usar
+
+1. Na tela, clique na área tracejada (ou arraste) e escolha um arquivo `.csv`
+   (exemplo: `<NOME_DO_CSV_DE_EXEMPLO>.csv`).
+2. Clique em **Processar Carteira**.
+3. Veja o resumo, a tabela (12 notas por página) e use os botões
+   **Todas / Aprovadas / Negadas** e **Primeira / Anterior / Próxima / Última**.
+
+Para parar o servidor, volte ao terminal e pressione `Ctrl + C`.
+
+## Formato do CSV
+
+Separador `;` ou `,`. Colunas aceitas (o nome do cabeçalho não diferencia maiúsculas
+nem acentos):
+
+`NOME_FUNDO; DOC_FUNDO; NOME_CEDENTE; DOC_CEDENTE; NOME_SACADO; DOC_SACADO;
+NU_DOCUMENTO; TIPO_RECEBIVEL; VALOR_NOMINAL; DATA_VENCIMENTO_ORIGINAL; DATA_AQUISICAO`
+
+Datas em `DD/MM/AAAA` (ou `AAAA-MM-DD`) e valores como `2278,08`.
+
+## Regras de classificação
+
+Definidas em `config_fundo.json` (relido a cada envio, **não precisa reiniciar o
+servidor** ao editar): CNPJ do sacado válido, tipo de recebível aceito, valor mínimo,
+nota não vencida, prazo máximo, concentração máxima por sacado e outras.
+
+- Prazo e vencimento são calculados **a partir da data de hoje**.
+  Para testar outra data: `POST /api/notas/validar?data_referencia=AAAA-MM-DD`
+  (pelo `/docs`).
+- Desconto: simples comercial, `valor × taxa mensal × prazo ÷ 30`.
+
+## Problemas comuns
+
+| Sintoma | Solução |
+|---|---|
+| `uvicorn: command not found` | O ambiente virtual não está ativo. Rode o passo 2 (ativar) de novo. |
+| `Address already in use` (porta 8000 ocupada) | Use outra porta: `uvicorn main:app --reload --port 8001` e abra `http://127.0.0.1:8001`. |
+| Tela mostra "Não foi possível conectar à API" | O servidor não está rodando. Execute o passo 4. |
+| Tela antiga após atualizar o código | Pressione `Ctrl + F5` no navegador. |
 ## Registro de Prompts:
 https://docs.google.com/document/d/154wWpaVjKimVpzvXibQOtD67Bxwn60aH3VSsKC1HEac/edit?tab=t.0
 
