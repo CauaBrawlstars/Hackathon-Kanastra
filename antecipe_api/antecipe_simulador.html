@@ -218,34 +218,61 @@
             </tr>`;
         }
 
-        let todas = [], pagina = 0;
-        const TAM = 100;
+        let todas = [], filtro = "todas", pagina = 0;
+        const TAM = 12;
+
+        const visiveis = () => filtro === "todas" ? todas : todas.filter((n) => n.status === (filtro === "aprovadas" ? "aprovada" : "recusada"));
+        const BTN = "px-3 py-1 border border-slate-300 rounded-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed";
 
         function desenhar() {
-            const fim = Math.min((pagina + 1) * TAM, todas.length);
-            $("corpo").innerHTML = todas.length
-                ? todas.slice(pagina * TAM, fim).map((n, i) => linha(n, i)).join("")
-                : `<tr><td colspan="8" class="py-10 px-4 text-center text-slate-500">Nenhuma nota válida encontrada no arquivo.</td></tr>`;
+            const lista = visiveis();
+            const paginas = Math.max(1, Math.ceil(lista.length / TAM));
+            pagina = Math.min(Math.max(pagina, 0), paginas - 1);
 
+            $("corpo").innerHTML = lista.length
+                ? lista.slice(pagina * TAM, (pagina + 1) * TAM).map((n, i) => linha(n, i)).join("")
+                : `<tr><td colspan="8" class="py-10 px-4 text-center text-slate-500">${todas.length ? "Nenhuma nota nesta categoria." : "Nenhuma nota válida encontrada no arquivo."}</td></tr>`;
+
+            // barra de filtros (criada uma vez, logo abaixo do resumo)
+            let barra = $("filtros");
+            if (!barra) {
+                barra = document.createElement("div");
+                barra.id = "filtros";
+                barra.className = "px-6 py-3 border-b border-slate-200 flex flex-wrap items-center gap-2 font-sans text-sm";
+                $("resumo").after(barra);
+            }
+            const nAprov = todas.filter((n) => n.status === "aprovada").length;
+            const contagens = { todas: todas.length, aprovadas: nAprov, recusadas: todas.length - nAprov };
+            const rotulos = { todas: "Todas", aprovadas: "Aprovadas", recusadas: "Negadas" };
+            barra.innerHTML = '<span class="text-slate-500 mr-1">Mostrar:</span>' + Object.keys(rotulos).map((k) =>
+                `<button type="button" data-filtro="${k}" class="px-3 py-1 rounded-sm border ${filtro === k ? "bg-brand-primary text-white border-brand-primary" : "border-slate-300 text-slate-600 hover:bg-slate-50"}">${rotulos[k]} (${contagens[k]})</button>`).join("");
+            barra.querySelectorAll("button").forEach((b) => b.onclick = () => { filtro = b.dataset.filtro; pagina = 0; desenhar(); });
+
+            // paginação
             let pager = $("pager");
             if (!pager) {
                 pager = document.createElement("div");
                 pager.id = "pager";
-                pager.className = "flex items-center justify-center gap-4 py-4 text-sm";
+                pager.className = "flex flex-wrap items-center justify-center gap-2 py-4 text-sm";
                 $("corpo").closest("table").after(pager);
             }
-            const paginas = Math.max(1, Math.ceil(todas.length / TAM));
+            const ini = pagina === 0, fimPag = pagina >= paginas - 1;
             pager.innerHTML = `
-                <button id="ant" class="px-3 py-1 border rounded disabled:opacity-40" ${pagina === 0 ? "disabled" : ""}>Anterior</button>
-                <span>Página ${pagina + 1} de ${paginas} (${todas.length} notas)</span>
-                <button id="prox" class="px-3 py-1 border rounded disabled:opacity-40" ${pagina + 1 >= paginas ? "disabled" : ""}>Próxima</button>`;
-            $("ant").onclick = () => { pagina--; desenhar(); };
-            $("prox").onclick = () => { pagina++; desenhar(); };
+                <button id="pg-primeira" class="${BTN}" ${ini ? "disabled" : ""}>« Primeira</button>
+                <button id="pg-ant" class="${BTN}" ${ini ? "disabled" : ""}>‹ Anterior</button>
+                <span class="px-2 text-slate-600">Página ${pagina + 1} de ${paginas} (${lista.length} notas)</span>
+                <button id="pg-prox" class="${BTN}" ${fimPag ? "disabled" : ""}>Próxima ›</button>
+                <button id="pg-ultima" class="${BTN}" ${fimPag ? "disabled" : ""}>Última »</button>`;
+            $("pg-primeira").onclick = () => { pagina = 0; desenhar(); };
+            $("pg-ant").onclick = () => { pagina--; desenhar(); };
+            $("pg-prox").onclick = () => { pagina++; desenhar(); };
+            $("pg-ultima").onclick = () => { pagina = paginas - 1; desenhar(); };
         }
 
         function renderizar(r) {
             const s = r.resumo;
             todas = r.notas;
+            filtro = "todas";
             pagina = 0;
             desenhar();
 
