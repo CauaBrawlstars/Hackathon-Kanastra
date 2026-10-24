@@ -42,7 +42,7 @@ O servidor FastAPI também entrega a tela (`antecipe_simulador.html`), então ba
 
 ```bash
 git clone https://github.com/CauaBrawlstars/Hackathon-Kanastra.git
-cd Hackathon-Kanastra/antecipe_api      # a pasta que contém o arquivo main.py
+cd Hackathon-Kanastra/antecipe_api
 ```
 
 #### 2. Criar o ambiente virtual
