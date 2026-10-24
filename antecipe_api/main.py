@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 from collections import Counter
 from datetime import date
@@ -15,6 +17,8 @@ from validadores import checar_config, fmt_cnpj, montar_contexto, prazo_dias, va
 
 CONFIG_PATH = Path(__file__).parent / "config_fundo.json"
 FRONT_PATH = Path(__file__).parent / "antecipe_simulador.html"
+SITUACAO_PATH = Path(__file__).parent / "cnpj_situacao_mock.csv"
+SITUACAO_PADRAO = "ATIVA"  # CNPJ que não consta na base de situação é considerado ativo
 
 app = FastAPI(title="Antecipe API", description="Validação de lotes de recebíveis")
 app.add_middleware(  # front-end em outra porta/origem; restrinja em produção
@@ -30,6 +34,24 @@ def carregar_config() -> dict:
         return config
     except (OSError, ValueError, KeyError) as e:
         raise HTTPException(500, f"Configuração do fundo inválida: {e}")
+
+
+def carregar_situacoes() -> dict[str, str]:
+    """CNPJ (só dígitos) -> situação cadastral, lido de cnpj_situacao_mock.csv.
+    Devolve {} se o arquivo não existir ou não tiver as colunas DOC e SITUACAO_CADASTRAL."""
+    try:
+        texto = decodificar(SITUACAO_PATH.read_bytes())
+    except OSError:
+        return {}
+    cabecalho = texto.splitlines()[0] if texto.strip() else ""
+    sep = ";" if cabecalho.count(";") >= cabecalho.count(",") else ","
+    situacoes = {}
+    for linha in csv.DictReader(io.StringIO(texto), delimiter=sep):
+        doc = so_digitos(linha.get("DOC") or "")
+        situacao = (linha.get("SITUACAO_CADASTRAL") or "").strip()
+        if doc and situacao:
+            situacoes[doc] = situacao
+    return situacoes
 
 
 @app.get("/", include_in_schema=False)
@@ -57,8 +79,27 @@ def validar_lote(
     except ValueError as e:
         raise HTTPException(422, str(e))
 
+    # Situação cadastral: se o CSV não trouxer a coluna, usa cnpj_situacao_mock.csv.
+    # Sacado que não consta nesse arquivo é considerado ATIVA.
+    situacoes = carregar_situacoes() if "situacao_sacado" not in colunas else {}
+    sem_registro, notas_sem_registro = set(), 0
+    if situacoes:
+        for r in itens:
+            situacao = situacoes.get(r.sacado_cnpj)
+            if not situacao:
+                situacao = SITUACAO_PADRAO
+                sem_registro.add(r.sacado_cnpj)
+                notas_sem_registro += 1
+            r.situacao_sacado = situacao
+        colunas = colunas | {"situacao_sacado"}
+
     ctx = montar_contexto(itens, ref, colunas)  # concentração depende do lote inteiro
     avisos = gerar_avisos(config, ctx)
+    if sem_registro:
+        avisos.append(
+            f"Situação cadastral lida de {SITUACAO_PATH.name}: {len(sem_registro)} sacado(s) "
+            f"({notas_sem_registro} nota(s)) não constam no arquivo e foram considerados {SITUACAO_PADRAO}."
+        )
     cnpj_fundo = so_digitos(config["fundo"]["cnpj"])
     outros = sorted({r.doc_fundo for r in itens if r.doc_fundo and r.doc_fundo != cnpj_fundo})
     if outros:
