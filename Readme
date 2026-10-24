@@ -72,3 +72,10 @@ https://docs.google.com/document/d/154wWpaVjKimVpzvXibQOtD67Bxwn60aH3VSsKC1HEac/
 *   **Cauã Victor Ribeiro Soares** - Backend Developer - [LinkedIn](https://www.linkedin.com/in/cau%C3%A3-victor-ribeiro-soares-03a69b3a9/)
 *   **Pedro Miranda Borges** - Frontend Developer - [LinkedIn](https://www.linkedin.com/in/pedro-miranda-borges-a1760a3ab/)
 *   **Vitor Luiz Martins de Abreu** - Backend Developer - [LinkedIn](https://www.linkedin.com/in/vitor-luiz-445262275/)
+
+
+
+
+   pkill -f uvicorn
+   source ../.venv/bin/activate
+   uvicorn main:app --reload
