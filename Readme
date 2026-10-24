@@ -1,5 +1,34 @@
 Informações sobre o projeto do Hackaton da Kanastra equipe MVP
 --------------------------------------------------------------
+
+# 🚀 Portal Antecipe
+
+> Transformando vendas a prazo em fluxo de caixa imediato para pequenas empresas, com avaliação de risco inteligente e transparente.
+
+## 💡 O Problema e a Solução
+Pequenas empresas frequentemente sofrem com a falta de capital de giro por venderem a prazo. O **Portal Antecipe** permite que essas empresas antecipem seus recebíveis vendendo-os para um fundo de investimento. 
+
+Nossa solução automatiza e simplifica esse processo com um motor de elegibilidade rigoroso, garantindo que o fundo compre apenas notas dentro das regras (prazo, valor mínimo, risco de sacado e CNPJ ativo), ao mesmo tempo em que oferece uma experiência transparente para a empresa, explicando exatamente o porquê de uma nota ter sido aceita ou recusada.
+
+## ✨ Principais Funcionalidades
+
+### 🖥️ Frontend & Experiência (UX)
+- **Upload em Lote (CSV):** Processamento rápido de múltiplas notas fiscais simultaneamente.
+- **Simulação de Valor Líquido:** Tabela em tempo real com o status de cada nota e o cálculo automático do valor de face menos a taxa de desconto.
+- **Transparência de Recusa:** Jornada de UX focada em traduzir os critérios técnicos do fundo em feedbacks claros para o usuário, reduzindo a frustração.
+
+### ⚙️ Backend & Arquitetura
+- **API de Validação e Precificação:** Cálculo de taxa de desconto simples e validação de elegibilidade.
+- **Motor de Regras Configurável:** Arquitetura modelada para permitir que o gestor do fundo altere os parâmetros (ex: prazo máximo, taxa) sem a necessidade de novos deploys.
+- **Garantia de Idempotência:** Sistema blindado contra *double spending*, garantindo que o mesmo recebível jamais seja vendido ou processado duas vezes.
+
+### 🛠 Tecnologias Utilizadas
+- **Frontend:** HTML[Tailwind e Google Fonts, por CDN]
+- **Backend:**Python[Framework Fast API]
+- **Infraestrutura:** [LocalHost com conexão Internet]
+
+#################################################################
+
 Como instalar o fastapi[all]
 
 1. Abra o terminal (Prompt de Comando/PowerShell no Windows, Terminal no Linux/Mac).
@@ -28,3 +57,14 @@ bash
   source .venv/bin/activate
   pip install "fastapi[all]"
 
+Para efetividade do projeto é necessária conexão com rede internet, o frontend depende de duas bibliotecas externas (Tailwind e
+Google Fonts, por CDN), então precisa de internet para ficar com o visual correto.
+
+
+👥 Equipe
+
+    Cauã Victor Ribeiro Soares - [BackEnd Developer] - https://www.linkedin.com/in/cau%C3%A3-victor-ribeiro-soares-03a69b3a9/
+
+    Pedro Miranda Borges - [FrontEnd Developer] - https://www.linkedin.com/in/pedro-miranda-borges-a1760a3ab/
+
+    Vitor Luiz Martins de Abreu - [BackEnd Developer] - [LinkedIn/GitHub]
