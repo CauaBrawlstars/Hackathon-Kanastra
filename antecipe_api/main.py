@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 from leitor import decodificar, ler_recebiveis, so_digitos
 from precificacao import precificar
 from validadores import avisos as gerar_avisos
-from validadores import checar_config, fmt_cnpj, montar_contexto, prazo_dias, validar
+from validadores import brl, checar_config, fmt_cnpj, montar_contexto, prazo_dias, validar
 
 CONFIG_PATH = Path(__file__).parent / "config_fundo.json"
 FRONT_PATH = Path(__file__).parent / "antecipe_simulador.html"
@@ -79,6 +79,13 @@ def validar_lote(
     except ValueError as e:
         raise HTTPException(422, str(e))
 
+    # Filtro por fundo: só as notas do fundo configurado são avaliadas. As de outros fundos
+    # ficam de fora da avaliação, do total do lote e da concentração.
+    # Sem a coluna DOC_FUNDO (ou com a célula vazia) a nota é considerada do fundo.
+    cnpj_fundo = so_digitos(config["fundo"]["cnpj"])
+    outros = [r for r in itens if r.doc_fundo and r.doc_fundo != cnpj_fundo]
+    itens = [r for r in itens if not r.doc_fundo or r.doc_fundo == cnpj_fundo]
+
     # Situação cadastral: se o CSV não trouxer a coluna, usa cnpj_situacao_mock.csv.
     # Sacado que não consta nesse arquivo é considerado ATIVA.
     situacoes = carregar_situacoes() if "situacao_sacado" not in colunas else {}
@@ -100,11 +107,14 @@ def validar_lote(
             f"Situação cadastral lida de {SITUACAO_PATH.name}: {len(sem_registro)} sacado(s) "
             f"({notas_sem_registro} nota(s)) não constam no arquivo e foram considerados {SITUACAO_PADRAO}."
         )
-    cnpj_fundo = so_digitos(config["fundo"]["cnpj"])
-    outros = sorted({r.doc_fundo for r in itens if r.doc_fundo and r.doc_fundo != cnpj_fundo})
+    valor_outros = sum((r.valor for r in outros), Decimal(0))
+    fundos_outros = {r.doc_fundo for r in outros}
     if outros:
-        avisos.append("O arquivo contém recebíveis de outro fundo: "
-                      + ", ".join(fmt_cnpj(c) for c in outros) + ".")
+        avisos.append(
+            f"{len(outros)} nota(s) de {len(fundos_outros)} outro(s) fundo(s) foram ignoradas "
+            f"(total {brl(valor_outros)}). Só as notas do {config['fundo']['nome']} são avaliadas e "
+            "entram no total do lote e no cálculo de concentração."
+        )
 
     notas, aprovadas = [], []
     for r in itens:
@@ -147,6 +157,9 @@ def validar_lote(
             "valor_aprovado": float(sum((r.valor for r, _ in aprovadas), Decimal(0))),
             "valor_presente_aprovado": round(sum(p["valor_presente"] for _, p in aprovadas), 2),
             "motivos": dict(contagem),
+            "ignoradas_outro_fundo": len(outros),
+            "fundos_ignorados": len(fundos_outros),
+            "valor_ignorado": float(valor_outros),
         },
         "notas": notas,
         "erros": erros,

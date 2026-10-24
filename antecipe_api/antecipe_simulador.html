@@ -282,6 +282,7 @@
                 <span class="text-brand-success"><strong>${s.aprovadas}</strong> aprovadas</span>
                 <span class="text-brand-danger"><strong>${s.recusadas}</strong> negadas</span>
                 <span>Valor original: <strong>${brl(s.valor_total)}</strong></span>
+                ${s.ignoradas_outro_fundo ? `<span class="text-slate-500">${s.ignoradas_outro_fundo.toLocaleString("pt-BR")} ignoradas (outro fundo)</span>` : ""}
                 <span>Total a receber: <strong>${brl(s.valor_presente_aprovado)}</strong></span>`;
             resumo.classList.remove("hidden");
 
