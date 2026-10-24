@@ -3,21 +3,21 @@
 > Transformando vendas a prazo em fluxo de caixa imediato para pequenas empresas, com avaliação de risco inteligente e transparente.
 
 ## 💡 O Problema e a Solução
-Pequenas empresas frequentemente sofrem com a falta de capital de giro por venderem a prazo. O **Portal Antecipe** permite que essas empresas antecipem seus recebíveis vendendo-os para um fundo de investimento. 
+Pequenas empresas frequentemente sofrem com a falta de capital de giro por venderem a prazo. O **Portal Antecipe** permite que essas empresas antecipem seus recebíveis vendendo-os para um fundo de investimento.
 
-Nossa solução automatiza e simplifica esse processo com um motor de elegibilidade rigoroso, garantindo que o fundo compre apenas notas dentro das regras (prazo, valor mínimo, risco de sacado e CNPJ ativo), ao mesmo tempo em que oferece uma experiência transparente para a empresa, explicando exatamente o porquê de uma nota ter sido aceita ou recusada.
+Nossa solução automatiza e simplifica esse processo com um motor de elegibilidade rigoroso, garantindo que o fundo compre apenas notas dentro das regras (prazo, valor mínimo, tipo de recebível, risco de concentração do sacado e CNPJ válido), ao mesmo tempo em que oferece uma experiência transparente para a empresa, explicando exatamente o porquê de uma nota ter sido aceita ou recusada.
 
 ## ✨ Principais Funcionalidades
 
 ### 🖥️ Frontend & Experiência (UX)
-- **Upload em Lote (CSV):** Processamento rápido de múltiplas notas fiscais simultaneamente.
-- **Simulação de Valor Líquido:** Tabela em tempo real com o status de cada nota e o cálculo automático do valor de face menos a taxa de desconto.
+- **Upload em Lote (CSV):** Processamento rápido de múltiplas notas fiscais simultaneamente (testado com um arquivo de ~100 mil notas).
+- **Simulação de Valor Líquido:** Tabela com o status de cada nota e o cálculo automático do valor de face menos a taxa de desconto.
+- **Tabela paginada e filtrável:** 12 notas por página, com filtros *Todas / Aprovadas / Negadas* e navegação *Primeira / Anterior / Próxima / Última*.
 - **Transparência de Recusa:** Jornada de UX focada em traduzir os critérios técnicos do fundo em feedbacks claros para o usuário, reduzindo a frustração.
 
 ### ⚙️ Backend & Arquitetura
 - **API de Validação e Precificação:** Cálculo de taxa de desconto simples e validação de elegibilidade.
-- **Motor de Regras Configurável:** Arquitetura modelada para permitir que o gestor do fundo altere os parâmetros (ex: prazo máximo, taxa) sem a necessidade de novos deploys.
-- **Garantia de Idempotência:** Sistema blindado contra *double spending*, garantindo que o mesmo recebível jamais seja vendido ou processado duas vezes.
+- **Motor de Regras Configurável:** Os parâmetros (ex: prazo máximo, taxa, valor mínimo) ficam em `config_fundo.json`, que é relido a cada envio, sem necessidade de reiniciar o servidor ou fazer novo deploy.
 
 ## 🛠 Tecnologias Utilizadas
 - **Frontend:** HTML nativo utilizando Tailwind CSS e Google Fonts (via CDN).
@@ -26,30 +26,26 @@ Nossa solução automatiza e simplifica esse processo com um motor de elegibilid
 
 > ⚠️ **Aviso Importante:** Para o correto funcionamento do projeto, é **obrigatória a conexão com a internet**. O frontend depende de bibliotecas externas (Tailwind CSS e Google Fonts carregados via CDN) para renderizar a interface visual corretamente.
 
-## 🚀 Como executar localmente
+## ▶️ Como Executar
 
-# Antecipe – Validador de Recebíveis (ANTECIPE FIDC)
+O servidor FastAPI também entrega a tela (`antecipe_simulador.html`), então basta subir a API.
 
-API em Python (FastAPI) que lê um CSV de recebíveis, valida cada nota com as regras
-do fundo (`config_fundo.json`), classifica como **Aprovada** ou **Negada** e calcula
-o valor a receber das aprovadas. A tela (`antecipe_simulador.html`) é servida pelo
-próprio servidor, então basta subir a API.
-
-## Requisitos
+### Requisitos
 
 - Python **3.10 ou superior** (`python3 --version`)
 - Git
+- Conexão com a internet (veja o aviso acima)
 
-## Passo a passo
+### Passo a passo
 
-### 1. Baixar o projeto
+#### 1. Baixar o projeto
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
-cd <PASTA_DO_PROJETO>      # a pasta que contém o arquivo main.py
+git clone https://github.com/CauaBrawlstars/Hackathon-Kanastra.git
+cd Hackathon-Kanastra/antecipe_api
 ```
 
-### 2. Criar o ambiente virtual
+#### 2. Criar o ambiente virtual
 
 Linux / macOS:
 ```bash
@@ -65,59 +61,51 @@ python -m venv .venv
 
 Se o Debian/Ubuntu reclamar de `ensurepip`, instale antes: `sudo apt install python3-venv`.
 
-### 3. Instalar as dependências
+#### 3. Instalar as dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Iniciar o servidor (API + tela)
+#### 4. Iniciar o servidor (API + tela)
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Aguarde a mensagem `Application startup complete`. **Deixe este terminal aberto**
-enquanto usar o sistema.
+Aguarde a mensagem `Application startup complete`. **Deixe este terminal aberto** enquanto usar o sistema.
 
-### 5. Abrir no navegador
+#### 5. Abrir no navegador
 
 | O quê | Endereço |
 |---|---|
-| Tela do sistema | http://127.0.0.1:8000 |
+| Tela do sistema | http://127.0.0.1:8000 | obs, cole no navegador!
 | Documentação interativa da API (Swagger) | http://127.0.0.1:8000/docs |
 | Regras configuradas (JSON) | http://127.0.0.1:8000/api/config |
 
-### 6. Usar
+#### 6. Usar
 
-1. Na tela, clique na área tracejada (ou arraste) e escolha um arquivo `.csv`
-   (exemplo: `<NOME_DO_CSV_DE_EXEMPLO>.csv`).
+1. Na tela, clique na área tracejada (ou arraste) e escolha um arquivo `.csv` (exemplo incluído no projeto: `lote-exemplo.csv`).
 2. Clique em **Processar Carteira**.
-3. Veja o resumo, a tabela (12 notas por página) e use os botões
-   **Todas / Aprovadas / Negadas** e **Primeira / Anterior / Próxima / Última**.
+3. Veja o resumo e a tabela, e use os filtros e a paginação.
 
 Para parar o servidor, volte ao terminal e pressione `Ctrl + C`.
 
 ## Formato do CSV
 
-Separador `;` ou `,`. Colunas aceitas (o nome do cabeçalho não diferencia maiúsculas
-nem acentos):
+Separador `;` ou `,`. Colunas aceitas (o nome do cabeçalho não diferencia maiúsculas nem acentos):
 
-`NOME_FUNDO; DOC_FUNDO; NOME_CEDENTE; DOC_CEDENTE; NOME_SACADO; DOC_SACADO;
-NU_DOCUMENTO; TIPO_RECEBIVEL; VALOR_NOMINAL; DATA_VENCIMENTO_ORIGINAL; DATA_AQUISICAO`
+`NOME_FUNDO; DOC_FUNDO; NOME_CEDENTE; DOC_CEDENTE; NOME_SACADO; DOC_SACADO; NU_DOCUMENTO; TIPO_RECEBIVEL; VALOR_NOMINAL; DATA_VENCIMENTO_ORIGINAL; DATA_AQUISICAO`
 
 Datas em `DD/MM/AAAA` (ou `AAAA-MM-DD`) e valores como `2278,08`.
 
 ## Regras de classificação
 
-Definidas em `config_fundo.json` (relido a cada envio, **não precisa reiniciar o
-servidor** ao editar): CNPJ do sacado válido, tipo de recebível aceito, valor mínimo,
-nota não vencida, prazo máximo, concentração máxima por sacado e outras.
+Definidas em `config_fundo.json`: CNPJ do sacado válido, tipo de recebível aceito, valor mínimo, nota não vencida, prazo máximo e concentração máxima por sacado.
 
-- Prazo e vencimento são calculados **a partir da data de hoje**.
-  Para testar outra data: `POST /api/notas/validar?data_referencia=AAAA-MM-DD`
-  (pelo `/docs`).
+- Prazo e vencimento são calculados **a partir da data de hoje**. Para testar outra data: `POST /api/notas/validar?data_referencia=AAAA-MM-DD` (pelo `/docs`).
 - Desconto: simples comercial, `valor × taxa mensal × prazo ÷ 30`.
+- A **situação cadastral do sacado** só é verificada se o CSV trouxer essa coluna. Sem ela, a tela exibe um aviso amarelo e as notas não são checadas nesse critério.
 
 ## Problemas comuns
 
@@ -126,7 +114,9 @@ nota não vencida, prazo máximo, concentração máxima por sacado e outras.
 | `uvicorn: command not found` | O ambiente virtual não está ativo. Rode o passo 2 (ativar) de novo. |
 | `Address already in use` (porta 8000 ocupada) | Use outra porta: `uvicorn main:app --reload --port 8001` e abra `http://127.0.0.1:8001`. |
 | Tela mostra "Não foi possível conectar à API" | O servidor não está rodando. Execute o passo 4. |
+| Tela sem estilo (sem cores/fontes) | Sem internet: o Tailwind e as fontes vêm de CDN. |
 | Tela antiga após atualizar o código | Pressione `Ctrl + F5` no navegador. |
+
 ## Registro de Prompts:
 https://docs.google.com/document/d/154wWpaVjKimVpzvXibQOtD67Bxwn60aH3VSsKC1HEac/edit?tab=t.0
 
@@ -134,10 +124,3 @@ https://docs.google.com/document/d/154wWpaVjKimVpzvXibQOtD67Bxwn60aH3VSsKC1HEac/
 *   **Cauã Victor Ribeiro Soares** - Backend Developer - [LinkedIn](https://www.linkedin.com/in/cau%C3%A3-victor-ribeiro-soares-03a69b3a9/)
 *   **Pedro Miranda Borges** - Frontend Developer - [LinkedIn](https://www.linkedin.com/in/pedro-miranda-borges-a1760a3ab/)
 *   **Vitor Luiz Martins de Abreu** - Backend Developer - [LinkedIn](https://www.linkedin.com/in/vitor-luiz-445262275/)
-
-
-
-
-   pkill -f uvicorn
-   source ../.venv/bin/activate
-   uvicorn main:app --reload
