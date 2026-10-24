@@ -79,7 +79,7 @@ Aguarde a mensagem `Application startup complete`. **Deixe este terminal aberto*
 
 | O quê | Endereço |
 |---|---|
-| Tela do sistema | http://127.0.0.1:8000 |
+| Tela do sistema | http://127.0.0.1:8000 | obs, cole no navegador!
 | Documentação interativa da API (Swagger) | http://127.0.0.1:8000/docs |
 | Regras configuradas (JSON) | http://127.0.0.1:8000/api/config |
 
